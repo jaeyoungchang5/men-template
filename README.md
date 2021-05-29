@@ -1,5 +1,5 @@
 # men-template
-A template for a node and express server with a MongoDB database.
+A template for creating a server with Node.js, Express.js, and a MongoDB database. I am using a **MEN** tech stack (Mongo, Express, Node).
 
 ## Do It Yourself
 1. Create a folder for the server: `mkdir backend`
