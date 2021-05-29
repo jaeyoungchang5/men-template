@@ -1,6 +1,10 @@
 # men-template
 A template for creating a server with Node.js, Express.js, and a MongoDB database. I am using a **MEN** tech stack (Mongo, Express, Node).
 
+## Running the server
+- If you are *testing* your backend, I would recommend downloading [Nodemon](https://nodemon.io/), which will monitor for any changes in your source and automatically restart your server. Simply run `nodemon server.js`.
+- If you are *deploying* your backend on a server, run `nohup node server.js &` to run the server in the background and keep a track of the console logs in a file `nohup.out`.
+
 ## What's In Each Folder
 - **config** contains configuration files. 
 - **controllers** contains controller files.
