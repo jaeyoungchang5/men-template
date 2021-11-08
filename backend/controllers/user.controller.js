@@ -51,7 +51,7 @@ function signup(req, res){
 function login(req, res){
     debuglog('LOG', 'user controller - login', 'attempting login');
     
-    User.findOne({username: req.body.netID.toLowerCase()})
+    User.findOne({username: req.body.username.toLowerCase()})
     .then(foundUser => {
         if (!foundUser){
             debuglog('ERROR', 'user controller - login', 'user username not found');
