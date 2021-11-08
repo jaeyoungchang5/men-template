@@ -5,8 +5,8 @@
  */
 
 /* import dependencies */
-const mongoose = require('mongoose');
-const debuglog = require('../debuglog');
+import mongoose from 'mongoose';
+import * as debuglog from '../debuglog';
 
 /* import env variables */
 const username = process.env.MONGOATLAS_USERNAME;
@@ -22,5 +22,5 @@ mongoose.connect(databaseUrl, { useNewUrlParser: true, useUnifiedTopology: true,
 const db = mongoose.connection;
 
 db.once('connected', () => {
-    debuglog('LOG', 'database config', `Connected to MongoDB '${db.name}' at '${db.host}' at port ${db.port}`);
+    debuglog.debuglog('LOG', 'database config', `Connected to MongoDB '${db.name}' at '${db.host}' at port ${db.port}`);
 });

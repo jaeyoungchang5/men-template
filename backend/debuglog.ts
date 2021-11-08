@@ -9,8 +9,10 @@
  * @param {String} func : function information to help identify where the log is coming from
  * @param {String} message : console log message
  */
-function debuglog(type, func, message){
+function debuglog(type: String, func: String, message: String){
     console.log(`[${type}] :: ${func} :: ${message} :: ` + new Date());
 }
 
-module.exports = debuglog;
+export {
+    debuglog
+};

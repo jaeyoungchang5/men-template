@@ -1,14 +1,14 @@
 /**
- * @fileoverview server.js
+ * @fileoverview server.ts
  * This file handles the startup of the server
  */
 
 /* import dependencies */
-const express = require('express');
-const body_parser = require('body-parser');
-const dotenv = require('dotenv');
+import express from 'express';
+import body_parser from 'body-parser';
+import dotenv from 'dotenv';
 dotenv.config(); // activate dotenv
-const debuglog = require('./debuglog');
+import * as debuglog from './debuglog';
 
 /* import env variables */
 const backend_port = process.env.BACKEND_PORT;
@@ -24,5 +24,5 @@ app.use('/api', routes); // all api routes will follow 'https://localhost:PORT/a
 require('./config/database'); // call database config to connect to MongoDB
 
 app.listen(backend_port, () => {
-    debuglog('LOG', 'server', `Server is listening on port ${backend_port}`);
+    debuglog.debuglog('LOG', 'server', `Server is listening on port ${backend_port}`);
 });
