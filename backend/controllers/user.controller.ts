@@ -4,9 +4,8 @@
  */
 
 /* import dependencies */
-import { debuglog } from '../debuglog';
+import { debuglog, createToken } from '../helpers';
 import { User } from '../models/user.model';
-import * as jwt from 'jsonwebtoken';
 import { Request, Response } from 'express';
 
 /**
@@ -74,21 +73,6 @@ export function login(req: Request, res: Response){
         res.status(401).json(err);
         return;
     });
-}
-
-/**
- * @function createToken : creates a jwt token for user
- * @param {*} user 
- * @returns String : jwt token
- */
-function createToken(user: any) {
-    const body = {
-        username: user.username, 
-        firstName: user.firstName, 
-        lastName: user.lastName 
-    }
-
-    return jwt.sign({ user: { body } }, process.env.ACCESS_TOKEN_SECRET);
 }
 
 /**

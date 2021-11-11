@@ -13,7 +13,7 @@ dotenv.config();
 const app = express();
 
 /* import modules */
-import { debuglog } from './debuglog';
+import { debuglog } from './helpers/debuglog';
 import { connectDB } from './config/database'
 import { router } from './routes/router'; // listen for router endpoints
 

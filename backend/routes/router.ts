@@ -6,7 +6,7 @@
 /* import dependencies */
 import express from 'express';
 const router = express.Router(); // activate router
-import { debuglog } from '../debuglog';
+import { debuglog } from '../helpers/debuglog';
 
 /* link controllers */
 //import * as usersCtrl from '../controllers/user.controller';

@@ -6,7 +6,7 @@
 
 /* import dependencies */
 import { connect, connection, Connection } from 'mongoose';
-import { debuglog } from '../debuglog';
+import { debuglog } from '../helpers/debuglog';
 
 /* import env variables */
 const username = process.env.MONGOATLAS_USERNAME;
