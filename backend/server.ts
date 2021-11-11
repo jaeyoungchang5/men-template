@@ -5,24 +5,27 @@
 
 /* import dependencies */
 import express from 'express';
-import body_parser from 'body-parser';
 import dotenv from 'dotenv';
-dotenv.config(); // activate dotenv
-import * as debuglog from './debuglog';
+import body_parser from 'body-parser';
+
+/* set up */
+dotenv.config();
+const app = express();
+
+/* import modules */
+import { debuglog } from './debuglog';
+import { connectDB } from './config/database'
+import { router } from './routes/router'; // listen for router endpoints
 
 /* import env variables */
 const backend_port = process.env.BACKEND_PORT;
 
 /* startup server */
-const app = express();
-
-const routes = require('./routes/router'); // listen for router endpoints
+connectDB(); // connect to the database
 app.use(body_parser.json());
 app.use(body_parser.urlencoded({extended: true}));
-app.use('/api', routes); // all api routes will follow 'https://localhost:PORT/api/ENDPOINTS' format
-
-require('./config/database'); // call database config to connect to MongoDB
+app.use('/api', router); // all api routes will follow 'https://localhost:PORT/api/ENDPOINTS' format
 
 app.listen(backend_port, () => {
-    debuglog.debuglog('LOG', 'server', `Server is listening on port ${backend_port}`);
+    debuglog('LOG', 'server', `Server is listening on port ${backend_port}`);
 });
