@@ -25,6 +25,7 @@ router.post('/signup', usersCtrl.signup);
 router.post('/login', usersCtrl.login);
 router.get('/user/info/:username', usersCtrl.getUserInfo);
 router.put('/user/info/:username', usersCtrl.putUserInfo);
+router.put('/user/password/:username', usersCtrl.putUserPassword);
 
 export {
     router

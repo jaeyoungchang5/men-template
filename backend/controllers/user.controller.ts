@@ -118,8 +118,8 @@ export function getUserInfo(req: Request, res: Response){
 }
 
 /**
- * @function putUserInfo : PUT request to update user info
- * @param {String} req.params.username : username 
+ * @function putUserInfo : PUT request to update user info (will not update password)
+ * @param {String} req.params.username : username
  */
 export function putUserInfo(req: Request, res: Response){
     let body: {[key:string]: any} = {};
@@ -129,6 +129,14 @@ export function putUserInfo(req: Request, res: Response){
             continue;
         }
         body[key] = req.body[key];
+    }
+
+    if (Object.keys(body).length == 0) {
+        console.log("empty");
+
+        debuglog('LOG', 'user controller - updateUserInfo', 'nothing to update');
+        res.status(200).json({ result: 'success', message: 'Nothing to update' });
+        return;
     }
 
     User.updateOne(req.params, {$set: body})
@@ -147,4 +155,42 @@ export function putUserInfo(req: Request, res: Response){
         debuglog('ERROR', 'user controller - updateUserInfo', err);
         res.status(500).json(err.message);
     });
+}
+
+/**
+ * @function putUserPassword : PUT request to update user password
+ * @param {String} req.params.username : username
+ */
+export function putUserPassword(req: Request, res: Response) {
+    const body = {
+        "password": req.body.password
+    };
+
+    User.findOne({username: req.params.username})
+    .then(foundUser => {
+        if (!foundUser){
+            debuglog('ERROR', 'user controller - login', 'user username not found');
+            res.status(404).json({result: 'error', message: 'Username not found'});
+            return;
+        }
+
+        debuglog('LOG', 'user controller - put user password', 'attempting to update password');
+        foundUser.password = body.password;
+        foundUser.save()
+        .then(newUser => {
+            debuglog('LOG', 'user controller - put user password', 'updated password');
+            const token = createToken(newUser);
+            res.status(201).json({result: 'success', message: 'Update password successful', token: token});
+        }).catch(err => { // catch errors
+            debuglog('ERROR', 'user controller - put user password', err);
+            res.status(400).json(err);
+        });
+
+    }).catch(err => { // catch errors
+        debuglog('ERROR', 'user controller - login', err);
+        res.status(401).json(err);
+        return;
+    });
+
+
 }
