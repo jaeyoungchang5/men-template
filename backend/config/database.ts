@@ -5,8 +5,8 @@
  */
 
 /* import dependencies */
-const mongoose = require('mongoose');
-const debuglog = require('../debuglog');
+import { connect, connection, Connection } from 'mongoose';
+import { debuglog } from '../debuglog';
 
 /* import env variables */
 const username = process.env.MONGOATLAS_USERNAME;
@@ -17,10 +17,18 @@ const cluster = process.env.MONGOATLAS_CLUSTER;
 const databaseUrl = `mongodb+srv://${username}:${password}@${cluster}`;
 
 /* connect to mongodb */
-mongoose.connect(databaseUrl, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true });
+function connectDB(): void {
+    connect(databaseUrl);
+    const db: Connection = connection;
 
-const db = mongoose.connection;
+    db.once('open', async () => {
+        debuglog('LOG', 'database config', `Connected to MongoDB '${db.name}' at '${db.host}' at port ${db.port}`);
+    });
+    db.on('error', () => {
+        debuglog('ERROR', 'database config', `Error connecting to database`);
+    });
+}
 
-db.once('connected', () => {
-    debuglog('LOG', 'database config', `Connected to MongoDB '${db.name}' at '${db.host}' at port ${db.port}`);
-});
+export {
+    connectDB
+};

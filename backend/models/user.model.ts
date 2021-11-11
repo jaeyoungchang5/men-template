@@ -7,15 +7,22 @@
  */
 
 /* import dependencies */
-const mongoose = require('mongoose');
-const bcrypt = require('bcrypt'); // use bcrypt for password encryption
+import { Document, Schema, Model, model } from 'mongoose';
+import * as bcrypt from 'bcrypt';
 
-/* import global options */
-const options = require('../options.json');
-const privacyOptions = options['User.privacyOptions'];
+interface IUser {
+    firstName: String,
+    lastName: String,
+    username: String,
+    password: String,
+}
+
+interface IUserModel extends IUser, Document {
+    checkPassword(password: string): boolean;
+}
 
 /* user schema structure */
-const userSchema = new mongoose.Schema({
+const UserSchema: Schema = new Schema({
     firstName: {
         type: String,
         required: true
@@ -33,27 +40,12 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    privacy: {
-        type: String,
-        enum: privacyOptions,
-        required: true
-    },
-    coordinates: {
-        latitude: {
-            type: Number,
-            default: 41.70307706874321
-        },
-        longitude: {
-            type: Number,
-            default: -86.23898524167699
-        }
-    }
 });
 
 /**
  * @method pre('save') : user method for encrypting password before saving the user
  */
-userSchema.pre('save', function(next){
+UserSchema.pre('save', function(next): void{
     const user = this;
 
     bcrypt.hash(user.password, Number(process.env.SALT), function(err, hash) {
@@ -65,11 +57,15 @@ userSchema.pre('save', function(next){
 
 /**
  * @method checkPassword : check password using bcrypt compare when user attempts login
- * @param {String} password : password given by user when trying to login 
- * @param {*} params 
+ * @param {String} password : password given by user when trying to login
  */
-userSchema.methods.checkPassword = function(password, params) {
-    bcrypt.compare(password, this.password, params);
-}
+// UserSchema.methods.checkPassword = function(password: string, params) {
+//     compare(password, this.password, params);
+// }
 
-module.exports = mongoose.model('user', userSchema);
+UserSchema.method('checkPassword', function(password: string): boolean {
+    if (bcrypt.compareSync(password, this.password)) return true;
+    return false;
+});
+
+export const User: Model<IUserModel> = model<IUserModel>("User", UserSchema);
