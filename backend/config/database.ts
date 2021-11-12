@@ -9,12 +9,12 @@ import { connect, connection, Connection } from 'mongoose';
 import { debuglog } from '../helpers/debuglog';
 
 /* import env variables */
-const username = process.env.MONGOATLAS_USERNAME;
-const password = process.env.MONGOATLAS_PASSWORD;
-const cluster = process.env.MONGOATLAS_CLUSTER;
+const username: string = process.env.MONGOATLAS_USERNAME;
+const password: string = process.env.MONGOATLAS_PASSWORD;
+const cluster: string = process.env.MONGOATLAS_CLUSTER;
 
 // set up full databaseUrl path
-const databaseUrl = `mongodb+srv://${username}:${password}@${cluster}`;
+const databaseUrl: string = `mongodb+srv://${username}:${password}@${cluster}`;
 
 /* connect to mongodb */
 function connectDB(): void {

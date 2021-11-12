@@ -5,7 +5,7 @@
 
 /* import dependencies */
 import { debuglog, createToken } from '../helpers';
-import { User } from '../models/user.model';
+import { User } from '../models';
 import { Request, Response } from 'express';
 
 /**
@@ -147,28 +147,34 @@ export function putUserInfo(req: Request, res: Response){
  */
 export function putUserPassword(req: Request, res: Response) {
     const body = {
-        "password": req.body.password
+        "oldPassword": req.body.oldPassword,
+        "newPassword": req.body.newPassword
     };
 
     User.findOne({username: req.params.username})
     .then(foundUser => {
         if (!foundUser){
-            debuglog('ERROR', 'user controller - login', 'user username not found');
+            debuglog('ERROR', 'user controller - put user password', 'user username not found');
             res.status(404).json({result: 'error', message: 'Username not found'});
             return;
         }
 
         debuglog('LOG', 'user controller - put user password', 'attempting to update password');
-        foundUser.password = body.password;
-        foundUser.save()
-        .then(newUser => {
-            debuglog('LOG', 'user controller - put user password', 'updated password');
-            const token = createToken(newUser);
-            res.status(201).json({result: 'success', message: 'Update password successful', token: token});
-        }).catch(err => { // catch errors
-            debuglog('ERROR', 'user controller - put user password', err);
-            res.status(400).json(err);
-        });
+        if (foundUser.checkPassword(body.oldPassword)){
+            foundUser.password = body.newPassword;
+            foundUser.save()
+            .then(newUser => {
+                debuglog('LOG', 'user controller - put user password', 'updated password');
+                const token = createToken(newUser);
+                res.status(201).json({result: 'success', message: 'Update password successful', token: token});
+            }).catch(err => { // catch errors
+                debuglog('ERROR', 'user controller - put user password', err);
+                res.status(400).json(err);
+            });
+        } else {
+            debuglog('LOG', 'user controller - put user password', 'found user, incorrect password');
+            res.status(400).json({result: 'error', message: 'Incorrect password'});
+        }
 
     }).catch(err => { // catch errors
         debuglog('ERROR', 'user controller - login', err);

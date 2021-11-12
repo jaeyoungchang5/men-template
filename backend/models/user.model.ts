@@ -11,10 +11,10 @@ import { Document, Schema, Model, model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
 
 interface IUser {
-    firstName: String,
-    lastName: String,
-    username: String,
-    password: String,
+    firstName: string,
+    lastName: string,
+    username: string,
+    password: string,
 }
 
 interface IUserModel extends IUser, Document {

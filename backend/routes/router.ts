@@ -4,9 +4,9 @@
  */
 
 /* import dependencies */
-import express from 'express';
-const router = express.Router(); // activate router
-import { debuglog } from '../helpers/debuglog';
+import express, { Response, Request, Router } from 'express';
+const router: Router = express.Router(); // activate router
+import { debuglog } from '../helpers';
 
 /* link controllers */
 //import * as usersCtrl from '../controllers/user.controller';
@@ -15,7 +15,7 @@ import * as usersCtrl from '../controllers/user.controller';
 /* ROUTE ENDPOINTS */
 
 // test
-router.get('/test', (req, res) => {
+router.get('/test', (req: Request, res: Response): void => {
     debuglog('LOG', 'router - test', 'Router Test Success');
     res.json({'result': 'router test success'});
 });
