@@ -1,3 +1,8 @@
+/**
+ * @fileoverview token.ts
+ * This file contains a function to help with token creation.
+ */
+
 import * as jwt from 'jsonwebtoken';
 
 /**

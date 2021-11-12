@@ -1,5 +1,5 @@
 /**
- * @fileoverview user.controller.js
+ * @fileoverview user.controller.ts
  * This file contains all the controller functions for the user collection.
  */
 

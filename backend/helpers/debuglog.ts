@@ -1,5 +1,5 @@
 /**
- * @fileoverview debuglog.js
+ * @fileoverview debuglog.ts
  * This file contains a function for consistent console logging. 
  */
 

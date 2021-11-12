@@ -1,5 +1,5 @@
 /**
- * @fileoverview router.js
+ * @fileoverview router.ts
  * This file provides all the API endpoint routes for the server.
  */
 

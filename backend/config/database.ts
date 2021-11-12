@@ -1,5 +1,5 @@
 /**
- * @fileoverview database.js
+ * @fileoverview database.ts
  * This is the configuration file for the MongoDB database, which is hosted on Atlas Cloud. 
  * This connects the server to the DB via the Mongoose package.
  */

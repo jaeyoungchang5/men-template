@@ -1,9 +1,6 @@
 /**
- * @fileoverview user.model.js
+ * @fileoverview user.model.ts
  * This file is the model (schema) file for the user collection.
- * 
- * @todo
- * 1. make sure password is encrypted when user is updated
  */
 
 /* import dependencies */
