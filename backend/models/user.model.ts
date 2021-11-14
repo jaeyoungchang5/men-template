@@ -56,9 +56,6 @@ UserSchema.pre('save', function(next): void{
  * @method checkPassword : check password using bcrypt compare when user attempts login
  * @param {String} password : password given by user when trying to login
  */
-// UserSchema.methods.checkPassword = function(password: string, params) {
-//     compare(password, this.password, params);
-// }
 
 UserSchema.method('checkPassword', function(password: string): boolean {
     if (bcrypt.compareSync(password, this.password)) return true;
