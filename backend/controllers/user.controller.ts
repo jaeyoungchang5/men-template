@@ -9,11 +9,19 @@ import { User } from '../models';
 import { Request, Response } from 'express';
 
 /**
- * @function signup : POST request to signup a new user
- * req body: {"firstName": "___", "lastName": "___", "username": "___", "password": "___"}
- * res body: {result: 'success', message: 'Signup successful'}
+ * @function signup
+ * @description POST request - signup a new user
+ * @param {string} req.body.firstName
+ * @param {string} req.body.lastName
+ * @param {string} req.body.username
+ * @param {string} req.body.password
  */
-export function signup(req: Request, res: Response){
+export function signup(req: Request, res: Response): void{
+    if (!req.body.firstName || !req.body.lastName|| !req.body.username || !req.body.password) {
+        res.status(400).json({result: 'error', message: 'Unsatisfied requirements.'});
+        return;
+    }
+
     const body = {
         firstName: req.body.firstName,
         lastName: req.body.lastName,
@@ -24,9 +32,9 @@ export function signup(req: Request, res: Response){
     const user = new User(body);
     user.save()
     .then(newUser => {
-        debuglog('LOG', 'user controller - signup', 'signed up user');
+        debuglog('LOG', 'user controller - signup', 'signed up new user');
         const token = createToken(newUser);
-        res.status(201).json({result: 'success', message: 'Signup successful', token: token});
+        res.status(201).json({result: 'success', message: 'New user signup successful.', token: token});
     }).catch(err => { // catch errors
         debuglog('ERROR', 'user controller - signup', err);
         res.status(400).json(err);
@@ -34,16 +42,17 @@ export function signup(req: Request, res: Response){
 }
 
 /**
- * @function login : POST request to login an existing user
- * req endpoint: '/api/login'
- * req body: {"username": "___", "password": "___"}
- * res body:
- *      if login is successful,
- *          {result: 'success', message: 'Login successful'}
- *      if login is unsuccessful (incorrect pw), 
- *          {result: 'error', message: 'Incorrect password'}
+ * @function login
+ * @description POST request - request login for an existing user
+ * @param {string} req.body.username
+ * @param {string} req.body.password
  */
 export function login(req: Request, res: Response){
+    if (!req.body.username || !req.body.password) {
+        res.status(400).json({result: 'error', message: 'Unsatisfied requirements.'});
+        return;
+    }
+
     const body = {
         username: req.body.username.toLowerCase(),
         password: req.body.password,
@@ -53,8 +62,8 @@ export function login(req: Request, res: Response){
     User.findOne({username: body.username})
     .then(foundUser => {
         if (!foundUser){
-            debuglog('ERROR', 'user controller - login', 'user username not found');
-            res.status(404).json({result: 'error', message: 'Username not found'});
+            debuglog('ERROR', 'user controller - login', 'username not found');
+            res.status(404).json({result: 'error', message: 'Username not found.'});
             return;
         }
 
@@ -63,24 +72,29 @@ export function login(req: Request, res: Response){
             debuglog('LOG', 'user controller - login', 'found user, correct password');
             const token = createToken(foundUser);
             res.header('auth-token', token);
-            res.status(200).json({result: 'success', message: 'Login successful', token: token});
+            res.status(201).json({result: 'success', message: 'Login successful.', token: token});
         } else {
             debuglog('LOG', 'user controller - login', 'found user, incorrect password');
-            res.status(400).json({result: 'error', message: 'Incorrect password'});
+            res.status(401).json({result: 'error', message: 'Incorrect password, login unauthorized.'});
         }
     }).catch(err => { // catch errors
         debuglog('ERROR', 'user controller - login', err);
-        res.status(401).json(err);
+        res.status(400).json(err);
         return;
     });
 }
 
 /**
- * @function getUserInfo : GET request to get info for one user
- * @param {String} req.params.username : username 
- * @param {*} res : user's info
+ * @function getUserInfo
+ * @description GET request - get info for a given username
+ * @param {string} req.params.username
  */
 export function getUserInfo(req: Request, res: Response){
+    if (!req.params.username) {
+        res.status(400).json({result: 'error', message: 'Unsatisfied requirements.'});
+        return;
+    }
+
     const body = {
         username: req.params.username.toLowerCase()
     }
@@ -88,24 +102,37 @@ export function getUserInfo(req: Request, res: Response){
     User.findOne({username: body.username})
     .then(userData => {
         if (userData){
+            const returnData = {
+                username: userData.username,
+                firstName: userData.firstName,
+                lastName: userData.lastName,
+                _id: userData._id
+            }
             debuglog('LOG', 'user controller - getUserInfo', 'got user info');
-            res.status(200).json(userData);
+            res.status(200).json({result: 'success', message: returnData});
         } else {
-            debuglog('LOG', 'user controller - getUserInfo', 'user not found');
-            res.status(200).json({result: 'error', message: 'User not found'});
+            debuglog('ERROR', 'user controller - getUserInfo', 'username not found');
+            res.status(404).json({result: 'error', message: 'Username not found.'});
         }
     }).catch(err => { // catch errors
         debuglog('ERROR', 'user controller - getUserInfo', err);
-        res.status(401).json(err);
+        res.status(400).json(err);
         return;
     })
 }
 
 /**
- * @function putUserInfo : PUT request to update user info (will not update password)
- * @param {String} req.params.username : username
+ * @function putUserInfo
+ * @description PUT request - update user info (excluding password)
+ * @param {string} req.params.username
+ * @param {Object} req.body - will contain any fields that the user wants to update
  */
 export function putUserInfo(req: Request, res: Response){
+    if (!req.params.username) {
+        res.status(400).json({result: 'error', message: 'Unsatisfied requirements.'});
+        return;
+    }
+
     let body: {[key:string]: any} = {};
     let key: string
     for (key in req.body) {
@@ -116,46 +143,52 @@ export function putUserInfo(req: Request, res: Response){
     }
 
     if (Object.keys(body).length == 0) {
-        console.log("empty");
-
         debuglog('LOG', 'user controller - updateUserInfo', 'nothing to update');
-        res.status(200).json({ result: 'success', message: 'Nothing to update' });
+        res.status(400).json({ result: 'error', message: 'Nothing to update.' });
         return;
     }
 
-    User.updateOne(req.params, {$set: body})
+    User.updateOne({username: req.params.username}, {$set: body})
     .then(dbResponse => {
         if (dbResponse.modifiedCount == 1){
             debuglog('LOG', 'user controller - updateUserInfo', 'updated user info');
-            res.status(200).json({result: 'success', message: 'User update successful'});
+            res.status(201).json({result: 'success', message: 'User update successful.'});
         } else if (dbResponse.matchedCount == 0) {
             debuglog('LOG', 'user controller - updateUserInfo', 'username not found');
-            res.status(200).json({ result: 'error', message: 'username not found' });
-        }else if (dbResponse.modifiedCount == 0) {
+            res.status(404).json({ result: 'error', message: 'Username not found.' });
+        } else if (dbResponse.modifiedCount == 0) {
             debuglog('LOG', 'user controller - updateUserInfo', 'no info updated');
-            res.status(200).json({ result: 'error', message: 'no info updated' });
+            res.status(400).json({ result: 'error', message: 'No info updated.' });
         }
     }).catch(err => { // catch errors
         debuglog('ERROR', 'user controller - updateUserInfo', err);
-        res.status(500).json(err.message);
+        res.status(400).json(err.message);
     });
 }
 
 /**
- * @function putUserPassword : PUT request to update user password
- * @param {String} req.params.username : username
+ * @function putUserInfo
+ * @description PUT request - update user password
+ * @param {string} req.params.username
+ * @param {string} req.body.oldPassword - the user's old password
+ * @param {string} req.body.newPassword - the user's new password
  */
 export function putUserPassword(req: Request, res: Response) {
+    if (!req.params.username || !req.body.oldPassword || !req.body.newPassword) {
+        res.status(400).json({result: 'error', message: 'Unsatisfied requirements.'});
+        return;
+    }
+
     const body = {
-        "oldPassword": req.body.oldPassword,
-        "newPassword": req.body.newPassword
+        oldPassword: req.body.oldPassword,
+        newPassword: req.body.newPassword
     };
 
     User.findOne({username: req.params.username})
     .then(foundUser => {
         if (!foundUser){
             debuglog('ERROR', 'user controller - put user password', 'user username not found');
-            res.status(404).json({result: 'error', message: 'Username not found'});
+            res.status(404).json({result: 'error', message: 'Username not found.'});
             return;
         }
 
@@ -166,19 +199,19 @@ export function putUserPassword(req: Request, res: Response) {
             .then(newUser => {
                 debuglog('LOG', 'user controller - put user password', 'updated password');
                 const token = createToken(newUser);
-                res.status(201).json({result: 'success', message: 'Update password successful', token: token});
+                res.status(201).json({result: 'success', message: 'Update password successful.', token: token});
             }).catch(err => { // catch errors
                 debuglog('ERROR', 'user controller - put user password', err);
                 res.status(400).json(err);
             });
         } else {
             debuglog('LOG', 'user controller - put user password', 'found user, incorrect password');
-            res.status(400).json({result: 'error', message: 'Incorrect password'});
+            res.status(401).json({result: 'error', message: 'Incorrect password, update password unauthorized.'});
         }
 
     }).catch(err => { // catch errors
         debuglog('ERROR', 'user controller - login', err);
-        res.status(401).json(err);
+        res.status(400).json(err);
         return;
     });
 

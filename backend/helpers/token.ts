@@ -7,7 +7,7 @@ import * as jwt from 'jsonwebtoken';
 
 /**
  * @function createToken : creates a jwt token for user
- * @param {*} user 
+ * @param {Object} user 
  * @returns String : jwt token
  */
 export function createToken(user: any) {
