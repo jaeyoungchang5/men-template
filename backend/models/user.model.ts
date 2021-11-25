@@ -4,7 +4,7 @@
  */
 
 /* import dependencies */
-import { Document, Schema, Model, model } from 'mongoose';
+import mongoose, { Document, Schema, Model, model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
 
 interface IUser {
@@ -12,9 +12,15 @@ interface IUser {
     lastName: string,
     username: string,
     password: string,
+    bio: string,
+    privacyMode: number,
+    friends: mongoose.Types.ObjectId[],
+    friendRequests: mongoose.Types.ObjectId[],
+    sunsets: mongoose.Types.ObjectId[],
+    isDeleted: boolean,
 }
 
-interface IUserModel extends IUser, Document {
+export interface IUserModel extends IUser, Document {
     checkPassword(password: string): boolean;
 }
 
@@ -37,6 +43,34 @@ const UserSchema: Schema = new Schema({
         type: String,
         required: true
     },
+    bio: {
+        type: String,
+        default: ""
+    },
+    privacyMode: {
+        type: Number,
+        default: 0,
+        enum: [
+            0, // private
+            1 // public
+        ]
+    },
+    friends: [{
+        type: mongoose.Types.ObjectId,
+        ref: 'User'
+    }],
+    friendRequests: [{
+        type: mongoose.Types.ObjectId,
+        ref: 'Friend'
+    }],
+    sunsets: [{
+        type: mongoose.Types.ObjectId,
+        ref: 'Sunset'
+    }],
+    isDeleted: {
+        type: Boolean,
+        default: false
+    }
 });
 
 /**
